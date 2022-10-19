@@ -114,31 +114,101 @@ void get_player_next_action(player current_player, action *next_action) {
         *next_action = MOVE;
 }
 
-void get_place_args(player current_player,
+void get_tile_column_and_line(int *line, int *column) {
+    char ans[20] = "";
+    char column_ans;
+    int line_ans;
+
+    scanf("%s", ans);
+    column_ans = ans[0];
+    line_ans = (int)(ans[1] - '0');
+    while (column_ans < 'a' || column_ans > 'c' || line_ans < 1 || line_ans > 3) {
+        printf("Invalid option. Try again: (Ex.: a2, b3) ");
+        scanf("%s", ans);
+        column_ans = ans[0];
+        line_ans = (int)(ans[1] - '0');
+    }
+
+    *column = (int)(column_ans - 'a');
+    *line = 3 - line_ans;
+}
+
+void get_piece_size_to_place(board b,
+                             player current_player,
+                             size *piece_size) {
+    char ans[20] = "";
+
+    int small_available = get_nb_piece_in_house(b, current_player, SMALL) > 0;
+    int medium_available = get_nb_piece_in_house(b, current_player, MEDIUM) > 0;
+    int large_available = get_nb_piece_in_house(b, current_player, LARGE) > 0;
+    int n_available = small_available + medium_available + large_available;
+    int not_valid_ans = 1;
+
+    char pieces_available[50] = "";
+    char possible_answers[6] = {'s', 'S', 'm', 'M', 'l', 'L'};
+
+    if (n_available == 1) {
+        *piece_size = small_available ? SMALL : (medium_available ? MEDIUM : LARGE);
+    } else {
+        if (n_available == 3) {
+            strcpy(pieces_available, "[S]mall, [M]edium or [L]arge: ");
+        } else if (n_available == 2) {
+            if (small_available) {
+                strcat(pieces_available, "[S]mall or ");
+                if (medium_available) {
+                    strcat(pieces_available, "[M]edium: ");
+                } else {
+                    strcat(pieces_available, "[L]arge: ");
+                    possible_answers[2] = 'l';
+                    possible_answers[3] = 'L';
+                }
+            } else {
+                strcpy(pieces_available, "[M]edium or [L]arge: ");
+                possible_answers[0] = 'm';
+                possible_answers[1] = 'M';
+                possible_answers[2] = 'l';
+                possible_answers[3] = 'L';
+            }
+        }
+        printf("Which piece size? %s", pieces_available);
+        scanf("%s", ans);
+        for (int i = 0; i < 2 * n_available; i++) {
+            not_valid_ans *= ans[0] != possible_answers[i];
+        }
+        while (not_valid_ans) {
+            printf("Invalid option. Try again: %s", pieces_available);
+            scanf("%s", ans);
+            for (int i = 0; i < 2 * n_available; i++) {
+                not_valid_ans *= ans[0] != possible_answers[i];
+            }
+        }
+        if (ans[0] == 's' || ans[0] == 'S')
+            *piece_size = SMALL;
+        else if (ans[0] == 'm' || ans[0] == 'M')
+            *piece_size = MEDIUM;
+        else
+            *piece_size = LARGE;
+    }
+}
+
+void get_place_args(board b,
+                    player current_player,
                     size *piece_size,
                     int *place_line,
                     int *place_column) {
-    printf("Player %d: Which size? ", current_player);
-    scanf("%d", piece_size);
-    printf("Player %d: Which line? ", current_player);
-    scanf("%d", place_line);
-    printf("Player %d: Which column? ", current_player);
-    scanf("%d", place_column);
+    get_piece_size_to_place(b, current_player, piece_size);
+    printf("Which tile? (Ex.: b3) ");
+    get_tile_column_and_line(place_line, place_column);
 }
 
-void get_move_args(player current_player,
-                   int *source_line,
+void get_move_args(int *source_line,
                    int *source_column,
                    int *target_line,
                    int *target_column) {
-    printf("Player %d: Original piece line? ", current_player);
-    scanf("%d", source_line);
-    printf("Player %d: Original piece column? ", current_player);
-    scanf("%d", source_column);
-    printf("Player %d: New piece line? ", current_player);
-    scanf("%d", target_line);
-    printf("Player %d: New piece column? ", current_player);
-    scanf("%d", target_column);
+    printf("Original piece tile? (Ex.: b3) ");
+    get_tile_column_and_line(source_line, source_column);
+    printf("New piece tile? (Ex.: b3) ");
+    get_tile_column_and_line(target_line, target_column);
 }
 
 int main(int args, char **argv) {
