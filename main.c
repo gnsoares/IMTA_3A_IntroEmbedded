@@ -229,8 +229,10 @@ int main(int args, char **argv) {
         do {
             get_player_next_action(current_player, &next_action);
             if (next_action == PLACE) {
-                get_place_args(current_player, &piece_size, &place_line, &place_column);
-                action_result = place_piece(game, current_player, piece_size, place_line, place_column);
+                get_place_args(game, current_player, &piece_size,
+                               &place_line, &place_column);
+                action_result = place_piece(game, current_player, piece_size,
+                                            place_line, place_column);
 
                 switch (action_result) {
                     case 1:
@@ -247,8 +249,11 @@ int main(int args, char **argv) {
                 }
 
             } else {
-                get_move_args(current_player, &source_line, &source_column, &target_line, &target_column);
-                action_result = move_piece(game, source_line, source_column, target_line, target_column);
+                get_move_args(&source_line, &source_column,
+                              &target_line, &target_column);
+                action_result = move_piece(game,
+                                           source_line, source_column,
+                                           target_line, target_column);
 
                 switch (action_result) {
                     case 1:
