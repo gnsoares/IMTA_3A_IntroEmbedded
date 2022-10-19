@@ -41,20 +41,61 @@ void print_tile_string(player p, size s) {
 }
 
 void show_board(board b) {
-    printf("\n+");
-    for (int i = 0; i < DIMENSIONS; i++)
-        printf("---+");
-
-    for (int i = 0; i < DIMENSIONS; i++) {
-        printf("\n|");
-        for (int j = 0; j < DIMENSIONS; j++)
-            print_tile_string(get_place_holder(b, i, j),
-                              get_piece_size(b, i, j));
-        printf("\n+");
-        for (int k = 0; k < DIMENSIONS; k++)
-            printf("---+");
+    int line;
+    printf("\n");
+    for (int i = 0; i < 2 * DIMENSIONS + 1; i++) {
+        if (i % 2 == 0) {
+            printf("  +");
+            for (int k = 0; k < DIMENSIONS; k++)
+                printf("---+");
+        } else {
+            line = (int)i / 2;
+            printf("%d |", 3 - line);
+            for (int j = 0; j < DIMENSIONS; j++)
+                print_tile_string(get_place_holder(b, line, j),
+                                  get_piece_size(b, line, j));
+        }
+        switch (i) {
+            case 0:
+                printf("\t  Player 1 pieces:\n");
+                break;
+            case 1:
+                printf(
+                    "\t     %s   %s   %s\n",
+                    get_nb_piece_in_house(b, PLAYER_1, SMALL) > 0 ? "\033[1;34m*\033[0m" : " ",
+                    get_nb_piece_in_house(b, PLAYER_1, MEDIUM) > 0 ? "\033[1;34mx\033[0m" : " ",
+                    get_nb_piece_in_house(b, PLAYER_1, LARGE) > 0 ? "\033[1;34mX\033[0m" : " ");
+                break;
+            case 2:
+                printf(
+                    "\t     %s   %s   %s\n",
+                    get_nb_piece_in_house(b, PLAYER_1, SMALL) > 1 ? "\033[1;34m*\033[0m" : " ",
+                    get_nb_piece_in_house(b, PLAYER_1, MEDIUM) > 1 ? "\033[1;34mx\033[0m" : " ",
+                    get_nb_piece_in_house(b, PLAYER_1, LARGE) > 1 ? "\033[1;34mX\033[0m" : " ");
+                break;
+            case 3:
+                printf("\t  Player 2 pieces:\n");
+                break;
+            case 4:
+                printf(
+                    "\t     %s   %s   %s\n",
+                    get_nb_piece_in_house(b, PLAYER_2, SMALL) > 0 ? "\033[1;33m.\033[0m" : " ",
+                    get_nb_piece_in_house(b, PLAYER_2, MEDIUM) > 0 ? "\033[1;33mo\033[0m" : " ",
+                    get_nb_piece_in_house(b, PLAYER_2, LARGE) > 0 ? "\033[1;33mO\033[0m" : " ");
+                break;
+            case 5:
+                printf(
+                    "\t     %s   %s   %s\n",
+                    get_nb_piece_in_house(b, PLAYER_2, SMALL) > 1 ? "\033[1;33m.\033[0m" : " ",
+                    get_nb_piece_in_house(b, PLAYER_2, MEDIUM) > 1 ? "\033[1;33mo\033[0m" : " ",
+                    get_nb_piece_in_house(b, PLAYER_2, LARGE) > 1 ? "\033[1;33mO\033[0m" : " ");
+                break;
+            default:
+                printf("\n");
+                break;
+        }
     }
-    printf("\n\n");
+    printf("    a   b   c\n\n");
 }
 
 action get_player_next_action(player current_player) {
@@ -159,6 +200,7 @@ int main(int args, char **argv) {
         winner = get_winner(game);
         current_player = next_player(current_player);
     }
+    show_board(game);
     printf("Player %d WINS!\n", winner);
 
     destroy_game(game);
