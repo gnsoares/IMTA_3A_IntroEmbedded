@@ -19,17 +19,24 @@ void print_tile_string(player p, size s) {
         return;
     }
     printf(" ");
-    if (p == PLAYER_1)
+    if (p == PLAYER_1) {
         printf("\033[1;34m");
-    else
-        printf("\033[1;33m");
+        if (s == SMALL)
+            printf("*");
+        else if (s == MEDIUM)
+            printf("x");
+        else
+            printf("X");
 
-    if (s == SMALL)
-        printf("x");
-    else if (s == MEDIUM)
-        printf("X");
-    else
-        printf("#");
+    } else {
+        printf("\033[1;33m");
+        if (s == SMALL)
+            printf(".");
+        else if (s == MEDIUM)
+            printf("o");
+        else
+            printf("O");
+    }
     printf("\033[0m |");
 }
 
