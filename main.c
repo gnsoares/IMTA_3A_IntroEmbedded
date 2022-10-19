@@ -98,21 +98,20 @@ void show_board(board b) {
     printf("    a   b   c\n\n");
 }
 
-action get_player_next_action(player current_player) {
-    action res = 0;
+void get_player_next_action(player current_player, action *next_action) {
+    char ans[20] = "";
 
-    printf("Player %d: What is your next action?\n", current_player);
-    printf("1 - Place\n");
-    printf("2 - Move\n");
-    scanf("%d", &res);
-    while (res < PLACE || res > MOVE) {
-        printf("Invalid option. Try again:\n");
-        printf("1 - Place\n");
-        printf("2 - Move\n");
-        scanf("%d", &res);
+    printf("Player %d: What is your next action? [P]lace or [M]ove: ", current_player);
+    scanf("%s", ans);
+    while (ans[0] != 'p' && ans[0] != 'P' && ans[0] != 'm' && ans[0] != 'M') {
+        printf("Invalid option. Try again: [P]lace or [M]ove: ");
+        scanf("%s", ans);
     }
 
-    return res;
+    if (ans[0] == 'p' || ans[0] == 'P')
+        *next_action = PLACE;
+    else
+        *next_action = MOVE;
 }
 
 void get_place_args(player current_player,
@@ -158,7 +157,7 @@ int main(int args, char **argv) {
     while (winner == NO_PLAYER) {
         show_board(game);
         do {
-            next_action = get_player_next_action(current_player);
+            get_player_next_action(current_player, &next_action);
             if (next_action == PLACE) {
                 get_place_args(current_player, &piece_size, &place_line, &place_column);
                 action_result = place_piece(game, current_player, piece_size, place_line, place_column);
